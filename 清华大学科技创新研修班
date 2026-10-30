@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>青运 · 清华大学科技创新研修班 | YMM Tsinghua Tech Seminar</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --tsinghua-purple: #660874;
+            --tsinghua-dark: #43044d;
+            --tech-cyan: #06b6d4;
+            --warm-bg: #f9f8f5;
+            --font-scale: 1;
+        }
+        html {
+            font-size: 16px !important;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--warm-bg);
+            -webkit-tap-highlight-color: transparent;
+            color: #1f2937;
+            font-size: calc(1rem * var(--font-scale, 1));
+        }
+        .serif-title {
+            font-family: 'Noto Serif SC', 'Songti SC', Georgia, serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .drag-handle {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* 仅对文字字号与适配信度行高进行独立缩放，完全不改变外层布局、间距、卡片宽高与容器 */
+        .text-\[9px\] { font-size: calc(9px * var(--font-scale, 1)) !important; line-height: 1.35 !important; }
+        .text-\[10px\] { font-size: calc(10px * var(--font-scale, 1)) !important; line-height: 1.35 !important; }
+        .text-\[11px\] { font-size: calc(11px * var(--font-scale, 1)) !important; line-height: 1.35 !important; }
+        .text-xs { font-size: calc(0.75rem * var(--font-scale, 1)) !important; line-height: 1.4 !important; }
+        .text-sm { font-size: calc(0.875rem * var(--font-scale, 1)) !important; line-height: 1.45 !important; }
+        .text-base { font-size: calc(1rem * var(--font-scale, 1)) !important; line-height: 1.5 !important; }
+        .text-lg { font-size: calc(1.125rem * var(--font-scale, 1)) !important; line-height: 1.45 !important; }
+        .text-xl { font-size: calc(1.25rem * var(--font-scale, 1)) !important; line-height: 1.4 !important; }
+        .text-2xl { font-size: calc(1.5rem * var(--font-scale, 1)) !important; line-height: 1.3 !important; }
+        .text-3xl { font-size: calc(1.875rem * var(--font-scale, 1)) !important; line-height: 1.25 !important; }
+        .text-4xl { font-size: calc(2.25rem * var(--font-scale, 1)) !important; line-height: 1.2 !important; }
+        .text-5xl { font-size: calc(3rem * var(--font-scale, 1)) !important; line-height: 1.15 !important; }
+        .text-6xl { font-size: calc(3.75rem * var(--font-scale, 1)) !important; line-height: 1.1 !important; }
+
+        /* 控制器自身保持固定精致尺寸 */
+        .font-ctrl-fixed {
+            font-size: 11px !important;
+            line-height: 1 !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'qingyun-tsinghua-2026';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth;
+        try {
+            if (Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+            }
+        } catch (e) {
+            console.warn("Offline or embedded mode:", e);
+        }
+
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
+        window.appId = appId;
+        window.initialAuthToken = initialAuthToken;
+        window.signInAnonymously = signInAnonymously;
+        window.signInWithCustomToken = signInWithCustomToken;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+        window.onSnapshot = onSnapshot;
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Super Admins Authorized for full control
+        const SUPER_ADMIN_EMAILS = [
+            "laishengchet@moe.gov.my",
+            "maymay6002@gmail.com"
+        ];
+
+        // 2026 Calendar Weekday Reference for Nov 7 - Nov 15
+        const WEEKDAYS_2026 = [
+            { zh: "星期六", en: "Saturday", short_zh: "周六", short_en: "Sat" },
+            { zh: "星期日", en: "Sunday", short_zh: "周日", short_en: "Sun" },
+            { zh: "星期一", en: "Monday", short_zh: "周一", short_en: "Mon" },
+            { zh: "星期二", en: "Tuesday", short_zh: "周二", short_en: "Tue" },
+            { zh: "星期三", en: "Wednesday", short_zh: "周三", short_en: "Wed" },
+            { zh: "星期四", en: "Thursday", short_zh: "周四", short_en: "Thu" },
+            { zh: "星期五", en: "Friday", short_zh: "周五", short_en: "Fri" },
+            { zh: "星期六", en: "Saturday", short_zh: "周六", short_en: "Sat" },
+            { zh: "星期日", en: "Sunday", short_zh: "周日", short_en: "Sun" }
+        ];
+
+        const getWeekdayInfo = (idx) => {
+            return WEEKDAYS_2026[idx % WEEKDAYS_2026.length];
+        };
+
+        // Comprehensive Bilingual Itinerary Data
+        const defaultBilingualData = {
+            header: {
+                title_zh: "青运 · 清华大学科技创新研修班",
+                title_en: "YMM · Tsinghua University Tech Innovation Seminar",
+                subtitle_zh: "走进清华 · 探索人工智能与硬核科技 · 拓展领袖国际格局",
+                subtitle_en: "Step into Tsinghua · Explore AI & Hard Tech · Expand Global Vision",
+                location_zh: "中国 · 北京",
+                location_en: "Beijing, China",
+                dates_zh: "2026年11月7日至15日",
+                dates_en: "Nov 7 - 15, 2026",
+                hotel_zh: "中关村科技园智选假日酒店（含每日早餐）",
+                hotel_en: "Holiday Inn Express Zhongguancun Science Park (Daily Breakfast Included)",
+                pax_zh: "50 人",
+                pax_en: "50 Delegates",
+                meeting_zh: "集合吉隆坡机场（KLIA1）时间：11月7日 09:00 PM",
+                meeting_en: "Gathering at KLIA1: Nov 7, 09:00 PM"
+            },
+            flights: [
+                {
+                    zh: "去程：CA 872 | 08NOV | KUL-PEK | 0020 / 0635（吉隆坡至北京首都）",
+                    en: "Outbound: CA 872 | 08NOV | KUL-PEK | 0020 / 0635 (Kuala Lumpur to Beijing)"
+                },
+                {
+                    zh: "回程：CA 871 | 15NOV | PEK-KUL | 1625 / 2300（北京首都至吉隆坡）",
+                    en: "Inbound: CA 871 | 15NOV | PEK-KUL | 1625 / 2300 (Beijing to Kuala Lumpur)"
+                },
+                {
+                    zh: "托运行李额度：1 PC / 23KG（每位团员免费托运一件）",
+                    en: "Checked Baggage Allowance: 1 PC / 23KG per passenger"
+                }
+            ],
+            days: [
+                {
+                    dayNum: "01",
+                    date_zh: "11月7日 星期六",
+                    date_en: "Nov 7, Saturday",
+                    title_zh: "启程前往北京",
+                    title_en: "Departure for Beijing",
+                    tag_zh: "启程赴京",
+                    tag_en: "Departure",
+                    location_zh: "吉隆坡国际机场 (KLIA1)",
+                    location_en: "Kuala Lumpur Int'l Airport (KLIA1)",
+                    img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "吉隆坡 ➔ 北京",
+                        city_en: "KUL ➔ Beijing",
+                        tempHigh: "15°C",
+                        tempLow: "3°C",
+                        condition_zh: "晴间多云",
+                        condition_en: "Clear to Cloudy",
+                        icon: "🌤️",
+                        pop: "0%",
+                        wear_zh: "降落北京首都机场时清晨气温较低（接近冰点），请将厚外套随身携带上机，着地前更换。",
+                        wear_en: "Beijing morning temperatures are close to freezing upon landing. Keep a warm coat in hand luggage."
+                    },
+                    meals: {
+                        breakfast_zh: "自理",
+                        breakfast_en: "Self-arranged",
+                        lunch_zh: "自理",
+                        lunch_en: "Self-arranged",
+                        dinner_zh: "机场 / 机上简餐",
+                        dinner_en: "Airport / In-flight Meal"
+                    },
+                    notice_zh: "请于 21:00 准时在 KLIA1 集合，检查护照有效期（6个月以上）与行李托运重量。",
+                    notice_en: "Assemble at KLIA1 by 9:00 PM. Verify passport validity (6+ months) and baggage weight limits.",
+                    items_zh: [
+                        "🕘 9:00 PM - 吉隆坡国际机场（KLIA1）统一集合",
+                        "✈️ 办理登机及出境手续，托运行李（限重 23KG）",
+                        "🇲🇾 搭乘中国国际航空 CA 872 直飞北京（00:20 起飞）"
+                    ],
+                    items_en: [
+                        "🕘 9:00 PM - Group gathering at KLIA1 Air China check-in counter",
+                        "✈️ Boarding & immigration procedures, check baggage (max 23KG)",
+                        "🇲🇾 Board Air China CA 872 flight to Beijing (Departure at 00:20)"
+                    ]
+                },
+                {
+                    dayNum: "02",
+                    date_zh: "11月8日 星期日",
+                    date_en: "Nov 8, Sunday",
+                    title_zh: "抵达北京 · 自由探访",
+                    title_en: "Arrive in Beijing & Leisure Exploration",
+                    tag_zh: "古都初见",
+                    tag_en: "Arrival",
+                    location_zh: "北京首都机场 / 中关村 / 故宫",
+                    location_en: "Beijing PEK / Zhongguancun / Forbidden City",
+                    img: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（中关村 / 海淀）",
+                        city_en: "Beijing (Haidian)",
+                        tempHigh: "13°C",
+                        tempLow: "2°C",
+                        condition_zh: "晴朗干燥",
+                        condition_en: "Sunny & Dry",
+                        icon: "☀️",
+                        pop: "0%",
+                        wear_zh: "清晨气温寒冷，外出建议防风夹克内搭毛衣。北方气候干燥，随身备好润唇膏与保温水杯。",
+                        wear_en: "Chilly morning. A windproof jacket with a light sweater is recommended. Carry lip balm and insulated water flask."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "自行安排自由品尝",
+                        lunch_en: "Self-arranged",
+                        dinner_zh: "自行安排（推荐周边家常菜）",
+                        dinner_en: "Self-arranged (Local dining recommended)"
+                    },
+                    notice_zh: "欲参观故宫博物院的团员，请务必提前7天通过微信小程序实名预约，现场不设售票窗。",
+                    notice_en: "For visiting the Palace Museum, advance real-name reservation via WeChat mini-program 7 days ahead is mandatory."
+                },
+                {
+                    dayNum: "03",
+                    date_zh: "11月9日 星期一",
+                    date_en: "Nov 9, Monday",
+                    title_zh: "北京全日自由文化体验",
+                    title_en: "Beijing Cultural Discovery (Free Day)",
+                    tag_zh: "京华寻萃",
+                    tag_en: "Culture",
+                    location_zh: "北京各人文地标 / 历史胡同",
+                    location_en: "Beijing Landmarks & Historic Hutongs",
+                    img: "https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（市区）",
+                        city_en: "Beijing (Downtown)",
+                        tempHigh: "12°C",
+                        tempLow: "1°C",
+                        condition_zh: "多云微风",
+                        condition_en: "Cloudy & Light Breeze",
+                        icon: "⛅",
+                        pop: "0%",
+                        wear_zh: "全天户外漫步建议穿着舒适防滑运动鞋，随身携带轻便保暖围巾。",
+                        wear_en: "Comfortable walking shoes are essential for all-day city walks. Bring a lightweight warm scarf."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "自行安排（推荐老北京炸酱面/小吃）",
+                        lunch_en: "Self-arranged (Zhajiangmian / Local snacks)",
+                        dinner_zh: "自行安排自由品尝",
+                        dinner_en: "Self-arranged"
+                    },
+                    notice_zh: "自由行期间建议使用微信/支付宝乘车码扫码搭乘地铁，便捷安全。",
+                    notice_en: "Use Alipay / WeChat Pay transit QR codes to easily access Beijing Subway system."
+                },
+                {
+                    dayNum: "04",
+                    date_zh: "11月10日 星期二",
+                    date_en: "Nov 10, Tuesday",
+                    title_zh: "天津人文历史一日游",
+                    title_en: "Tianjin Cultural Heritage Day Tour",
+                    tag_zh: "海河欧韵",
+                    tag_en: "Tianjin Tour",
+                    location_zh: "瓷房子 / 五大道 / 海河 / 天津之眼",
+                    location_en: "Porcelain House / Five Avenues / Tianjin Eye",
+                    img: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "天津（海河沿岸）",
+                        city_en: "Tianjin (Haihe River)",
+                        tempHigh: "14°C",
+                        tempLow: "3°C",
+                        condition_zh: "晴朗风大",
+                        condition_en: "Sunny & Windy",
+                        icon: "☀️",
+                        pop: "0%",
+                        wear_zh: "海河游船与摩天轮周边水岸阵风较大，体感温度偏凉，务必佩戴防风外套或羊毛围巾。",
+                        wear_en: "Riverbanks and ferries can be windy and chilly. Wear a windbreaker jacket and scarf."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "导游统一协调安排天津特色餐",
+                        lunch_en: "Tianjin specialty lunch coordinated by guide",
+                        dinner_zh: "建议老牌家常菜（郭林家常菜/小城外婆肴）",
+                        dinner_en: "Recommended Home-style cuisine (Guolin / Waipoyao)"
+                    },
+                    notice_zh: "北京-天津往返专属大巴，全程专业导游随团精讲，请准时在酒店大堂集合发车。",
+                    notice_en: "Chartered coach round trip. Professional guide accompanies throughout. Please gather punctually in the lobby."
+                },
+                {
+                    dayNum: "05",
+                    date_zh: "11月11日 星期三",
+                    date_en: "Nov 11, Wednesday",
+                    title_zh: "青联 · 前沿科技创新实地参访",
+                    title_en: "Youth Federation · Tech Innovation Visits",
+                    tag_zh: "硬核智造",
+                    tag_en: "Tech Frontier",
+                    location_zh: "机器人大世界 / 中关村 / 小米总部",
+                    location_en: "Robot World / Zhongguancun / Xiaomi HQ",
+                    img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（科技园区）",
+                        city_en: "Beijing (Tech Parks)",
+                        tempHigh: "11°C",
+                        tempLow: "0°C",
+                        condition_zh: "多云转晴",
+                        condition_en: "Cloudy to Clear",
+                        icon: "🌤️",
+                        pop: "5%",
+                        wear_zh: "进出企业及展厅室内暖气充足（22°C+），建议采用洋葱式穿法，内着衬衫外搭保暖大衣。",
+                        wear_en: "Indoor enterprise spaces are well-heated (22°C+). Wear layered clothing for easy transitioning."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "待青联确认协调安排",
+                        lunch_en: "Arrangements coordinated with Youth Federation",
+                        dinner_zh: "待青联确认协调安排",
+                        dinner_en: "Arrangements coordinated with Youth Federation"
+                    },
+                    notice_zh: "进入高科技企业及研发实验产线请严格遵守摄影与保密管理规定，佩戴学员证件。",
+                    notice_en: "Observe photography and confidentiality regulations when visiting tech facilities. Wear participant ID badges."
+                },
+                {
+                    dayNum: "06",
+                    date_zh: "11月12日 星期四",
+                    date_en: "Nov 12, Thursday",
+                    title_zh: "清华大学科技创新研修 Day 1",
+                    title_en: "Tsinghua Tech Seminar Day 1",
+                    tag_zh: "百年水木",
+                    tag_en: "Tsinghua Day 1",
+                    location_zh: "清华大学校史馆 / 大礼堂 / 校园",
+                    location_en: "Tsinghua History Museum / Auditorium / Campus",
+                    img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（清华大学校区）",
+                        city_en: "Beijing (Tsinghua Campus)",
+                        tempHigh: "12°C",
+                        tempLow: "1°C",
+                        condition_zh: "晴朗天清",
+                        condition_en: "Clear & Crisp",
+                        icon: "☀️",
+                        pop: "0%",
+                        wear_zh: "开班式请着商务便装（Smart Casual）。校园占地宽广，步行较多，请备舒适平底皮鞋或便鞋。",
+                        wear_en: "Smart casual attire required for the opening ceremony. Flat comfortable shoes recommended for campus walking."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "清华大学校内特色食堂体验",
+                        lunch_en: "Tsinghua Campus Canteen Experience",
+                        dinner_zh: "建议北京烤鸭名店（全聚德清华园店）",
+                        dinner_en: "Recommended Roast Duck (Quanjude Tsinghua Park)"
+                    },
+                    notice_zh: "清华大学开班式与校史馆参访，请全员提前10分钟抵达指定研修教室，严守课堂纪律。",
+                    notice_en: "Tsinghua seminar opening ceremony. Arrive 10 minutes ahead. Please observe academic lecture etiquette."
+                },
+                {
+                    dayNum: "07",
+                    date_zh: "11月13日 星期五",
+                    date_en: "Nov 13, Friday",
+                    title_zh: "清华大学科技创新研修 Day 2",
+                    title_en: "Tsinghua Tech Seminar Day 2",
+                    tag_zh: "模型实战",
+                    tag_en: "Tsinghua Day 2",
+                    location_zh: "清华大学 / 中国AI标杆企业",
+                    location_en: "Tsinghua Univ / Chinese AI Enterprise",
+                    img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（清华大学校区）",
+                        city_en: "Beijing (Tsinghua Campus)",
+                        tempHigh: "10°C",
+                        tempLow: "-1°C",
+                        condition_zh: "晴间多云 · 结冰点",
+                        condition_en: "Sunny / Sub-zero Night",
+                        icon: "⛅",
+                        pop: "0%",
+                        wear_zh: "夜间最低温降至零下，早起出行注意头部和颈部防风保暖。",
+                        wear_en: "Night temperatures dip below zero. Keep head and neck warm when going out in early morning."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "清华大学校内特色食堂体验",
+                        lunch_en: "Tsinghua Campus Canteen Experience",
+                        dinner_zh: "建议老北京家常风味餐馆",
+                        dinner_en: "Recommended Traditional Beijing Home-style restaurant"
+                    },
+                    notice_zh: "专题解析《DeepSeek大模型与管理场景应用实践》，请携带笔记本或平板以便记录实操重点。",
+                    notice_en: "Focus on 'DeepSeek LLM & Enterprise Practices'. Bring notebooks or tablets for case notes."
+                },
+                {
+                    dayNum: "08",
+                    date_zh: "11月14日 星期六",
+                    date_en: "Nov 14, Saturday",
+                    title_zh: "研修 Day 3 · 隆重结业典礼",
+                    title_en: "Seminar Day 3 & Graduation Ceremony",
+                    tag_zh: "荣耀结业",
+                    tag_en: "Graduation",
+                    location_zh: "清华大学学术讲堂",
+                    location_en: "Tsinghua University Lecture Hall",
+                    img: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京（清华大学校区）",
+                        city_en: "Beijing (Tsinghua Campus)",
+                        tempHigh: "9°C",
+                        tempLow: "-2°C",
+                        condition_zh: "初冬寒冷微风",
+                        condition_en: "Chilly Early Winter",
+                        icon: "☀️",
+                        pop: "0%",
+                        wear_zh: "正式结业典礼请穿着正装（西装/衬衫外套），室内配备充足暖气。",
+                        wear_en: "Formal / business attire is requested for the graduation ceremony and certificate presentation."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "清华大学校内特色食堂体验",
+                        lunch_en: "Tsinghua Campus Canteen Experience",
+                        dinner_zh: "建议老北京传统铜锅涮肉（聚清缘五道口店）",
+                        dinner_en: "Recommended Traditional Copper Hotpot (Juqingyuan Wudaokou)"
+                    },
+                    notice_zh: "结业式将隆重颁发《清华大学学习证书》并组织官方集体合影留念，请准时出席。",
+                    notice_en: "Official graduation ceremony with presentation of Tsinghua Certificates & group photos."
+                },
+                {
+                    dayNum: "09",
+                    date_zh: "11月15日 星期日",
+                    date_en: "Nov 15, Sunday",
+                    title_zh: "结束研修 · 启程返回马来西亚",
+                    title_en: "Program Conclusion & Flight Home",
+                    tag_zh: "满载归航",
+                    tag_en: "Homeward",
+                    location_zh: "中关村酒店 / 首都国际机场 / 吉隆坡",
+                    location_en: "Hotel / Beijing PEK / Kuala Lumpur KLIA1",
+                    img: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=1200&q=80",
+                    weather: {
+                        city_zh: "北京 ➔ 吉隆坡",
+                        city_en: "Beijing ➔ KUL",
+                        tempHigh: "11°C",
+                        tempLow: "1°C",
+                        condition_zh: "晴朗",
+                        condition_en: "Clear Sky",
+                        icon: "🛫",
+                        pop: "0%",
+                        wear_zh: "跨气候带返马，随身双肩包中请预留空间，以便抵达吉隆坡后收纳厚外套。",
+                        wear_en: "Traveling across climate zones. Leave room in carry-on bag to store thick winter jackets upon arriving in Malaysia."
+                    },
+                    meals: {
+                        breakfast_zh: "酒店包含自助早餐",
+                        breakfast_en: "Hotel Buffet Breakfast Included",
+                        lunch_zh: "自行安排 / 机场候机用餐",
+                        lunch_en: "Self-arranged / Airport Dining",
+                        dinner_zh: "国航班机机上晚餐",
+                        dinner_en: "In-flight Dinner on Air China"
+                    },
+                    notice_zh: "12:00 PM 准时在酒店大堂集合退房并乘坐大巴前往首都机场，办理行李直挂与登机。",
+                    notice_en: "Assemble at hotel lobby by 12:00 PM to check out and take coach to PEK airport."
+                }
+            ],
+            diningGuide: {
+                title_zh: "北京 50 人研学团队用餐甄选建议",
+                title_en: "Curated Beijing Dining Suggestions for 50 Pax",
+                categories: [
+                    {
+                        cat_zh: "老北京特色烤鸭",
+                        cat_en: "Traditional Peking Duck",
+                        list: [
+                            {
+                                name_zh: "全聚德（清华科技园店）· 推荐首选",
+                                name_en: "Quanjude Roast Duck (Tsinghua Tech Park) - Top Choice",
+                                detail_zh: "海淀区中关村东路1号启迪科技大厦A座1层 | 电话: 010-82150018 | 距酒店仅 4km (8-10分钟车程)，国宴老字号，具备 50 人多桌接待能力，预算约 120-150 元/人。",
+                                detail_en: "Qidi Tech Tower A, 1 Zhongguancun East Rd. Tel: 010-82150018. 4km from hotel (8-10 min drive). Capable of hosting 50 pax with private areas. ~RMB 120-150/pax."
+                            },
+                            {
+                                name_zh: "四季民福烤鸭店（故宫店）· 自由行推荐",
+                                name_en: "Siji Minfu Duck (Forbidden City View) - Free Day Pick",
+                                detail_zh: "东城区南池子大街11号故宫东门旁 | 面朝故宫筒子河与东华门，景致绝美，排队极火爆，建议自由活动日提早取号。",
+                                detail_en: "No.11 Nanchizi St, next to East Gate of Forbidden City. Magnificent view over Palace moat; very popular, take queue number early on free days."
+                            }
+                        ]
+                    },
+                    {
+                        cat_zh: "老北京传统铜锅涮肉",
+                        cat_en: "Old Beijing Copper Hotpot",
+                        list: [
+                            {
+                                name_zh: "聚清缘 · 铜锅涮肉（五道口清华店）",
+                                name_en: "Juqingyuan Copper Hotpot (Wudaokou Tsinghua)",
+                                detail_zh: "海淀区中关村东路1号启迪科技大厦C座102室 | 距酒店 4km。景泰蓝炭火铜锅、原汁清汤、鲜切羊肉与秘制麻酱，人均约 80-90 元。",
+                                detail_en: "Bldg C, Qidi Tech Tower, Wudaokou. 4km from hotel. Traditional cloisonné charcoal brass pots, fresh mutton cuts, ~RMB 80-90/pax."
+                            },
+                            {
+                                name_zh: "云尊府 · 山橄榄野生菌火锅（中关村店）",
+                                name_en: "Yunzunfu Wild Mushroom Hotpot (Zhongguancun)",
+                                detail_zh: "海淀区中关村南大街2号华宇时尚购物中心 | 云南野生菌熬制清甜鸡汤，清爽养生不辣，适合兼顾不同清淡口味。",
+                                detail_en: "Huayu Shopping Mall, Zhongguancun South St. Rich wild mushroom chicken broth, non-spicy, nutritious and light."
+                            }
+                        ]
+                    },
+                    {
+                        cat_zh: "地道家常菜推荐",
+                        cat_en: "Authentic Home-Style Cuisine",
+                        list: [
+                            {
+                                name_zh: "郭林家常菜（六道口店）",
+                                name_en: "Guolin Home-Style Restaurant (Liudaokou)",
+                                detail_zh: "海淀区清华东路25号 | 电话: 010-82377660 | 距酒店仅 2km (车程8分钟)，老牌连锁，大包厢轻松容纳50人，人均约 80 元。",
+                                detail_en: "No. 25 Tsinghua East Rd. Tel: 010-82377660. 2km from hotel. Spacious private halls suitable for 50 people, ~RMB 80/pax."
+                            },
+                            {
+                                name_zh: "小城外婆肴私房菜（上地店）",
+                                name_en: "Grandma's Private Kitchen (Shangdi Branch)",
+                                detail_zh: "海淀区上地六街康得大厦1层 | 距酒店 1.5km (车程5分钟)，家常精细小炒，菜品地道清爽，人均约 80 元。",
+                                detail_en: "Kangde Bldg, Shangdi 6th St. 1.5km from hotel. Delicate home dishes, fresh flavor, ~RMB 80/pax."
+                            },
+                            {
+                                name_zh: "眉州东坡酒楼（中关村店）",
+                                name_en: "Meizhou Dongpo Restaurant (Zhongguancun)",
+                                detail_zh: "海淀区中关村大街27号中关村大厦2层 | 距酒店 5km，知名品牌大型酒楼，环境宽敞优雅，适合团队用餐。",
+                                detail_en: "2nd Fl, Zhongguancun Bldg, 27 Zhongguancun St. Renowned restaurant with spacious seating for large delegations."
+                            }
+                        ]
+                    }
+                ]
+            },
+            generalReminders: {
+                title_zh: "研学行前温馨提醒与准则",
+                title_en: "Important Travel Reminders & Etiquette",
+                items: [
+                    {
+                        zh: "1. 11月8日及9日为自由活动时间。计划参观故宫博物院、国家博物馆等的团员，须提前7日晚20:00通过官方微信小程序进行实名预约购票（需填护照号）。",
+                        en: "1. Nov 8 & 9 are free exploration days. Palace Museum & National Museum tickets require real-name booking 7 days in advance via WeChat mini-programs using passport numbers."
+                    },
+                    {
+                        zh: "2. 11月10日（天津一日游）与 11月11日（科技创新参访）为统一团队外出行程，请全程佩戴研修胸牌并跟随大巴，切勿私自离队。",
+                        en: "2. Nov 10 (Tianjin) and Nov 11 (Tech Visits) are group tours. Wear badges and follow the coach schedule punctually."
+                    },
+                    {
+                        zh: "3. 11月12日至14日为清华大学正规研修课程，请全员着商务便装（Smart Casual），结业典礼建议正装出席。",
+                        en: "3. Nov 12-14 are official Tsinghua University seminars. Smart casual is required for classes, and formal attire for the graduation ceremony."
+                    },
+                    {
+                        zh: "4. 北京11月中旬气温处于秋冬交替，昼夜温差大，室内普遍通暖气（20°C以上）。建议备妥防风保暖大衣、保湿护肤品及保温水杯。",
+                        en: "4. Mid-November Beijing sees significant day-night temperature swings. Indoor spaces are heated (20°C+). Bring windbreakers, moisturizers, and a thermal flask."
+                    }
+                ]
+            }
+        };
+
+        function App() {
+            // Language state: 'zh' (default) or 'en'
+            const [lang, setLang] = useState('zh');
+            const [data, setData] = useState(defaultBilingualData);
+            const [selectedDayIndex, setSelectedDayIndex] = useState(null); // null = overview, 0-8 = day, 'flights' | 'dining' | 'reminders'
+            const [currentTime, setCurrentTime] = useState(new Date());
+
+            // Font scale controller: 0.85 (Small) to 1.35 (Large)
+            const [fontScale, setFontScale] = useState(1);
+
+            // Real-Time Live Weather State (Beijing)
+            const [liveWeather, setLiveWeather] = useState({
+                temp: "12°C",
+                apparentTemp: "10°C",
+                condition_zh: "晴朗微风",
+                condition_en: "Clear & Breezy",
+                icon: "🌤️",
+                humidity: "42%",
+                wind: "2级 (3.2 m/s)",
+                lastUpdated: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                isLoading: false
+            });
+
+            // Weather code mapper (WMO Interpretation)
+            const getWeatherDetailsByCode = (code) => {
+                if (code === 0) return { zh: '晴朗无云', en: 'Clear Sky', icon: '☀️' };
+                if ([1, 2].includes(code)) return { zh: '晴间多云', en: 'Partly Cloudy', icon: '🌤️' };
+                if (code === 3) return { zh: '阴天多云', en: 'Overcast', icon: '☁️' };
+                if ([45, 48].includes(code)) return { zh: '轻雾', en: 'Foggy', icon: '🌫️' };
+                if ([51, 53, 55, 61, 63, 65].includes(code)) return { zh: '小雨/中雨', en: 'Rainy', icon: '🌧️' };
+                if ([71, 73, 75, 77, 85, 86].includes(code)) return { zh: '小雪', en: 'Light Snow', icon: '❄️' };
+                if ([80, 81, 82].includes(code)) return { zh: '阵雨', en: 'Showers', icon: '🌦️' };
+                if ([95, 96, 99].includes(code)) return { zh: '雷阵雨', en: 'Thunderstorm', icon: '⛈️' };
+                return { zh: '多云天清', en: 'Partly Cloudy', icon: '🌤️' };
+            };
+
+            // Fetch live Beijing weather with graceful fallback
+            const fetchLiveWeather = async () => {
+                setLiveWeather(prev => ({ ...prev, isLoading: true }));
+                try {
+                    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=39.9042&longitude=116.4074&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FShanghai');
+                    if (!res.ok) throw new Error('Failed to fetch Open-Meteo weather');
+                    const json = await res.json();
+                    const current = json.current;
+                    const wInfo = getWeatherDetailsByCode(current.weather_code);
+                    setLiveWeather({
+                        temp: `${Math.round(current.temperature_2m)}°C`,
+                        apparentTemp: `${Math.round(current.apparent_temperature)}°C`,
+                        condition_zh: wInfo.zh,
+                        condition_en: wInfo.en,
+                        icon: wInfo.icon,
+                        humidity: `${current.relative_humidity_2m}%`,
+                        wind: `${current.wind_speed_10m} km/h`,
+                        lastUpdated: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                        isLoading: false
+                    });
+                } catch (err) {
+                    console.warn('Real-time weather update warning:', err);
+                    setLiveWeather(prev => ({
+                        ...prev,
+                        isLoading: false,
+                        lastUpdated: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                    }));
+                }
+            };
+
+            const changeFontSize = (delta) => {
+                setFontScale(prev => {
+                    const next = Math.round((prev + delta) * 100) / 100;
+                    return Math.min(1.35, Math.max(0.85, next));
+                });
+            };
+
+            // 仅动态设置 CSS 变量 --font-scale，确保只对文字生效，完全不影响布局间距与卡片尺寸
+            useEffect(() => {
+                document.documentElement.style.setProperty('--font-scale', fontScale);
+            }, [fontScale]);
+
+            // Admin system
+            const [isAdmin, setIsAdmin] = useState(false);
+            const [loggedInEmail, setLoggedInEmail] = useState('');
+            const [adminEmails, setAdminEmails] = useState(SUPER_ADMIN_EMAILS);
+            const [showAdminLogin, setShowAdminLogin] = useState(false);
+            const [adminEmail, setAdminEmail] = useState('');
+            const [loginError, setLoginError] = useState('');
+
+            // Edit Mode
+            const [isEditing, setIsEditing] = useState(false);
+            const [editData, setEditData] = useState(defaultBilingualData);
+            const [saveStatus, setSaveStatus] = useState('');
+            const [newAdminEmail, setNewAdminEmail] = useState('');
+
+            // Draggable AI Chatbot State
+            const [isChatOpen, setIsChatOpen] = useState(false);
+            const [chatPos, setChatPos] = useState({ x: null, y: null });
+            const [isDragging, setIsDragging] = useState(false);
+            const dragStartRef = useRef({ startX: 0, startY: 0, origX: 0, origY: 0, moved: false });
+            
+            const [chatMessages, setChatMessages] = useState([
+                {
+                    role: 'ai',
+                    text_zh: '您好！我是青运·清华研修班的专属 AI 智能助手 🤖。您可以随时向我咨询北京与天津的美食、消费预算、实时天气、穿搭指南、地铁交通及故宫清华攻略！',
+                    text_en: 'Hello! I am your AI assistant for the YMM Tsinghua Seminar 🤖. Ask me anything about Beijing/Tianjin food, daily budget, weather, outfits, subway transit, and campus tips!',
+                    time: '刚刚 / Just now'
+                }
+            ]);
+            const [chatInput, setChatInput] = useState('');
+            const [isAiTyping, setIsAiTyping] = useState(false);
+
+            // Drag handler for chatbot
+            const handleMouseDown = (e) => {
+                if (e.target.closest('.no-drag')) return;
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                const currentX = chatPos.x !== null ? chatPos.x : (window.innerWidth - (isChatOpen ? 400 : 180));
+                const currentY = chatPos.y !== null ? chatPos.y : (window.innerHeight - (isChatOpen ? 560 : 90));
+
+                dragStartRef.current = {
+                    startX: clientX,
+                    startY: clientY,
+                    origX: currentX,
+                    origY: currentY,
+                    moved: false
+                };
+
+                setIsDragging(true);
+
+                const handleMouseMove = (moveEvent) => {
+                    const moveX = moveEvent.type.includes('touch') ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                    const moveY = moveEvent.type.includes('touch') ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                    
+                    const deltaX = moveX - dragStartRef.current.startX;
+                    const deltaY = moveY - dragStartRef.current.startY;
+
+                    if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+                        dragStartRef.current.moved = true;
+                    }
+
+                    const width = isChatOpen ? 380 : 160;
+                    const height = isChatOpen ? 520 : 60;
+                    
+                    const newX = Math.max(10, Math.min(window.innerWidth - width - 10, dragStartRef.current.origX + deltaX));
+                    const newY = Math.max(10, Math.min(window.innerHeight - height - 10, dragStartRef.current.origY + deltaY));
+
+                    setChatPos({ x: newX, y: newY });
+                };
+
+                const handleMouseUp = () => {
+                    setIsDragging(false);
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('mouseup', handleMouseUp);
+                    window.removeEventListener('touchmove', handleMouseMove);
+                    window.removeEventListener('touchend', handleMouseUp);
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('mouseup', handleMouseUp);
+                window.addEventListener('touchmove', handleMouseMove);
+                window.addEventListener('touchend', handleMouseUp);
+            };
+
+            // Local AI Responder (Chinese & English)
+            const getAiAnswer = (queryText) => {
+                const q = queryText.toLowerCase().trim();
+
+                if (lang === 'zh') {
+                    if (q.includes('吃') || q.includes('美食') || q.includes('烤鸭') || q.includes('火锅') || q.includes('家常菜')) {
+                        return "🍲【美食建议速览】：\n• 烤鸭首选：全聚德（清华科技园店），距酒店4km，车程8分钟，可承接50人团队，人均约120-150元。\n• 铜锅涮肉：聚清缘·传统炭火铜锅涮肉（五道口店），清汤鲜切羊肉配特调麻酱，人均约80-90元。\n• 优质家常菜：郭林家常菜（六道口店，大包厢容纳50人）、小城外婆肴私房菜。\n• 酒店每天均含丰盛自助早餐，清华课程期间午餐在清华校园食堂体验！";
+                    }
+                    if (q.includes('预算') || q.includes('多少钱') || q.includes('花费') || q.includes('价格') || q.includes('钱')) {
+                        return "💰【消费与预算参考】：\n1. 普通正餐/家常炒菜：人均约 ¥60~80 元。\n2. 特色烤鸭大餐：人均约 ¥120~150 元。\n3. 地铁出行：单程票通常在 ¥3~7 元之间，微信/支付宝扫码即走。\n4. 故宫门票：淡季 ¥40 / 旺季 ¥60 元，须提前7天小程序预约实名制。\n5. 建议提前在支付宝/微信中绑定马来西亚信用卡，中国境内消费极为便利！";
+                    }
+                    if (q.includes('天气') || q.includes('穿') || q.includes('温度') || q.includes('衣服') || q.includes('冷')) {
+                        return "🧣【天气与穿衣指南】：\n• 11月7日至15日，北京日最高温约 9°C~15°C，夜间最低温降至 -2°C~3°C，昼夜温差大。\n• 室内（酒店、餐厅、清华大学课室）均通暖气（22°C+），强烈建议『洋葱式三层穿法』，方便进出脱穿。\n• 必备品：防风保暖大衣/轻薄羽绒服、高保湿面霜、润唇膏、保温水杯与舒适运动鞋。11/10天津海河游船风大，建议随身带围巾。";
+                    }
+                    if (q.includes('交通') || q.includes('地铁') || q.includes('打车') || q.includes('大巴')) {
+                        return "🚇【交通出行攻略】：\n• 团队行程（接送机、天津一日游、科技参访等）均配有专属旅游大巴与专业导游。\n• 自由活动日：打开微信或支付宝搜索『乘车码』即可刷码过闸乘坐北京地铁与公交；打车可直接在支付宝使用『滴滴出行』。";
+                    }
+                    return "您好！我是本次清华研修班的 AI 智能助手。您可以问我：\n• 🍗『北京烤鸭和铜锅涮肉哪家好？』\n• 💰『北京吃饭交通预算大概多少钱？』\n• 🧣『11月中旬北京气温如何？怎么穿衣服？』\n• 🚇『自由行怎么坐地铁？』\n• 🏛️『故宫门票如何预约？』";
+                } else {
+                    // English responses
+                    if (q.includes('food') || q.includes('eat') || q.includes('duck') || q.includes('hotpot') || q.includes('restaurant')) {
+                        return "🍲【Dining Recommendations】:\n• Peking Duck: Quanjude (Tsinghua Science Park branch), only 4km from hotel, ideal for 50 people, ~RMB 120-150/pax.\n• Old Beijing Hotpot: Juqingyuan (Wudaokou), authentic copper charcoal pot with fresh mutton & sesame sauce, ~RMB 80-90/pax.\n• Home-style Cuisine: Guolin (Liudaokou) or Grandma's Kitchen (Shangdi).\n• Daily buffet breakfast is included in the hotel. During Tsinghua days, lunch will be enjoyed in the university canteen!";
+                    }
+                    if (q.includes('budget') || q.includes('money') || q.includes('cost') || q.includes('price') || q.includes('how much')) {
+                        return "💰【Budget & Spending Guide】:\n1. Standard Meals: ~RMB 60-80 per person.\n2. Peking Duck Feast: ~RMB 120-150 per person.\n3. Subway Transit: ~RMB 3-7 per ride via Alipay/WeChat transit code.\n4. Palace Museum Ticket: ~RMB 40-60 (must be booked 7 days ahead).\n5. Tip: Link your Malaysian credit/debit card to Alipay or WeChat Pay before departure for cashless convenience.";
+                    }
+                    if (q.includes('weather') || q.includes('wear') || q.includes('temperature') || q.includes('clothes') || q.includes('cold')) {
+                        return "🧣【Weather & Outfit Advice】:\n• Nov 7-15 Beijing temperatures range between 9°C-15°C (Day) down to -2°C-3°C (Night).\n• Indoor spaces are well heated (22°C+). Wear layered clothing (onion style) for easy adjusting.\n• Essentials: Windproof jacket/down coat, lip balm, facial moisturizer, insulated water flask, walking sneakers. Bring a scarf for the windy Tianjin day tour on Nov 10.";
+                    }
+                    if (q.includes('transport') || q.includes('subway') || q.includes('taxi') || q.includes('bus')) {
+                        return "🚇【Transportation Guide】:\n• Group transfers, airport rides, Tianjin tour & tech visits are served by chartered coaches.\n• On free days: Search 'Transit Code' on Alipay or WeChat to scan into subway turnstiles. For taxis, use 'Didi' inside the Alipay app.";
+                    }
+                    return "Hello! I am your AI assistant for the Tsinghua seminar. Feel free to ask:\n• 🍗 'Where is the best Peking duck or hotpot?'\n• 💰 'How much is the average meal or subway ticket?'\n• 🧣 'What is the weather and what clothes should I pack?'\n• 🚇 'How do I take the subway on free days?'\n• 🏛️ 'How to book Forbidden City tickets?'";
+                }
+            };
+
+            const handleSendChatMessage = (text) => {
+                const query = text || chatInput;
+                if (!query.trim()) return;
+
+                const userMsg = {
+                    role: 'user',
+                    text_zh: query,
+                    text_en: query,
+                    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                setChatMessages(prev => [...prev, userMsg]);
+                setChatInput('');
+                setIsAiTyping(true);
+
+                setTimeout(() => {
+                    const ans = getAiAnswer(query);
+                    setChatMessages(prev => [
+                        ...prev,
+                        {
+                            role: 'ai',
+                            text_zh: ans,
+                            text_en: ans,
+                            time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                        }
+                    ]);
+                    setIsAiTyping(false);
+                }, 400);
+            };
+
+            // Clock & Live Weather auto-refresh timer (Hourly & Daily continuous updates)
+            useEffect(() => {
+                const clockTimer = setInterval(() => setCurrentTime(new Date()), 1000);
+                fetchLiveWeather();
+                const hourlyWeatherTimer = setInterval(fetchLiveWeather, 3600000); // Hourly refresh
+                return () => {
+                    clearInterval(clockTimer);
+                    clearInterval(hourlyWeatherTimer);
+                };
+            }, []);
+
+            // Firebase sync & authentication
+            useEffect(() => {
+                const initSync = async () => {
+                    try {
+                        if (window.firebaseAuth && window.signInAnonymously) {
+                            if (window.initialAuthToken && window.signInWithCustomToken) {
+                                await window.signInWithCustomToken(window.firebaseAuth, window.initialAuthToken).catch(() => {});
+                            } else {
+                                await window.signInAnonymously(window.firebaseAuth).catch(() => {});
+                            }
+                        }
+
+                        if (window.firebaseDb && window.onSnapshot && window.doc) {
+                            // Sync itinerary data
+                            const itineraryRef = window.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'itinerary', 'bilingual_v2');
+                            window.onSnapshot(itineraryRef, (snap) => {
+                                if (snap.exists()) {
+                                    setData(snap.data());
+                                }
+                            });
+
+                            // Sync admins list
+                            const adminsRef = window.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'admins', 'list_v2');
+                            window.onSnapshot(adminsRef, (snap) => {
+                                if (snap.exists() && snap.data().emails) {
+                                    setAdminEmails(Array.from(new Set([...SUPER_ADMIN_EMAILS, ...snap.data().emails])));
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.warn("Using offline / embedded configuration", e);
+                    }
+                };
+
+                initSync();
+            }, []);
+
+            const isCurrentSuperAdmin = (email) => {
+                return SUPER_ADMIN_EMAILS.some(se => se.toLowerCase() === (email || '').trim().toLowerCase());
+            };
+
+            const handleAdminLogin = (e) => {
+                e.preventDefault();
+                const emailClean = adminEmail.trim().toLowerCase();
+                if (adminEmails.map(a => a.toLowerCase()).includes(emailClean) || isCurrentSuperAdmin(emailClean)) {
+                    setIsAdmin(true);
+                    setLoggedInEmail(emailClean);
+                    setShowAdminLogin(false);
+                    setLoginError('');
+                } else {
+                    setLoginError(lang === 'zh' ? '该邮箱未获管理员授权。可联系超级管理员配置。' : 'This email is not authorized as an administrator.');
+                }
+            };
+
+            const handleSave = async () => {
+                setSaveStatus(lang === 'zh' ? '正在保存到云端...' : 'Saving to cloud...');
+                try {
+                    if (window.firebaseDb) {
+                        const itineraryRef = window.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'itinerary', 'bilingual_v2');
+                        await window.setDoc(itineraryRef, editData);
+                    }
+                    setData(editData);
+                    setSaveStatus(lang === 'zh' ? '保存成功！' : 'Saved successfully!');
+                    setTimeout(() => {
+                        setIsEditing(false);
+                        setSaveStatus('');
+                    }, 800);
+                } catch (error) {
+                    console.error("Save error:", error);
+                    setSaveStatus(lang === 'zh' ? '保存失败，请检查网络' : 'Save failed. Check connection.');
+                }
+            };
+
+            const handleAddAdmin = async () => {
+                const newEmail = newAdminEmail.trim().toLowerCase();
+                if (!newEmail || adminEmails.includes(newEmail)) return;
+                const updated = [...adminEmails, newEmail];
+                if (window.firebaseDb) {
+                    const adminsRef = window.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'admins', 'list_v2');
+                    await window.setDoc(adminsRef, { emails: updated });
+                }
+                setAdminEmails(updated);
+                setNewAdminEmail('');
+            };
+
+            const handleRemoveAdmin = async (removeEmail) => {
+                if (isCurrentSuperAdmin(removeEmail)) return;
+                const updated = adminEmails.filter(e => e.toLowerCase() !== removeEmail.toLowerCase());
+                if (window.firebaseDb) {
+                    const adminsRef = window.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'admins', 'list_v2');
+                    await window.setDoc(adminsRef, { emails: updated });
+                }
+                setAdminEmails(updated);
+            };
+
+            const startEditing = () => {
+                setEditData(JSON.parse(JSON.stringify(data)));
+                setIsEditing(true);
+            };
+
+            const getDaysLeft = () => {
+                const target = new Date('2026-11-07T21:00:00+08:00');
+                const diff = target - currentTime;
+                if (diff <= 0) return 0;
+                return Math.ceil(diff / (1000 * 60 * 60 * 24));
+            };
+
+            return (
+                <div className="min-h-screen bg-[#f9f8f5] text-slate-800 antialiased selection:bg-[#660874] selection:text-white">
+                    
+                    {/* Top Navigation Bar with Language Switcher & Admin */}
+                    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-xs">
+                        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                            
+                            {/* Logos & Titles */}
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <img src="https://i.postimg.cc/wjhQMKG7/ymmhq.jpg" alt="Logo 1" className="h-9 w-auto rounded-md shadow-xs object-contain" />
+                                    <img src="https://i.postimg.cc/ZqKRvgcq/ymm.png" alt="Logo 2" className="h-9 w-auto rounded-md shadow-xs object-contain" />
+                                </div>
+                                <div className="hidden sm:block border-l border-stone-300 pl-3">
+                                    <div className="text-xs font-black text-[#660874] tracking-wider">
+                                        {lang === 'zh' ? '青运 · 清华大学' : 'YMM · Tsinghua University'}
+                                    </div>
+                                    <div className="text-[11px] text-stone-600 font-bold">
+                                        {lang === 'zh' ? '科技创新研修班' : 'Tech Innovation Seminar'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Actions: Clock, Language Switcher & Admin Login */}
+                            <div className="flex items-center gap-2.5 sm:gap-3">
+                                
+                                {/* Live Time Pill */}
+                                <div className="hidden lg:flex items-center gap-2 text-xs font-semibold text-stone-600 bg-stone-100 px-3 py-1.5 rounded-full border border-stone-200">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>{lang === 'zh' ? '北京时间' : 'Beijing Time'}：{currentTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+
+                                {/* Font Size Adjuster (A- / A+) */}
+                                <div className="flex items-center bg-stone-100 p-0.5 rounded-full border border-stone-200 text-xs font-bold shadow-2xs">
+                                    <button 
+                                        onClick={() => changeFontSize(-0.08)}
+                                        disabled={fontScale <= 0.85}
+                                        title={lang === 'zh' ? "缩小文字字号" : "Decrease Font Size"}
+                                        className="w-7 h-7 flex items-center justify-center rounded-full text-stone-700 hover:bg-stone-200 active:scale-90 disabled:opacity-30 transition font-ctrl-fixed"
+                                    >
+                                        <span className="font-black font-ctrl-fixed">A-</span>
+                                    </button>
+                                    <span className="px-1.5 text-stone-500 font-mono select-none font-ctrl-fixed" title={lang === 'zh' ? "当前字号比例" : "Font Size Scale"}>
+                                        {Math.round(fontScale * 100)}%
+                                    </span>
+                                    <button 
+                                        onClick={() => changeFontSize(0.08)}
+                                        disabled={fontScale >= 1.35}
+                                        title={lang === 'zh' ? "放大文字字号" : "Increase Font Size"}
+                                        className="w-7 h-7 flex items-center justify-center rounded-full text-stone-700 hover:bg-stone-200 active:scale-90 disabled:opacity-30 transition font-ctrl-fixed"
+                                    >
+                                        <span className="font-black font-ctrl-fixed">A+</span>
+                                    </button>
+                                </div>
+
+                                {/* Language Switcher Button */}
+                                <div className="flex items-center bg-stone-100 p-0.5 rounded-full border border-stone-200 text-xs font-bold shadow-2xs">
+                                    <button 
+                                        onClick={() => setLang('zh')}
+                                        className={`px-2.5 py-1 rounded-full transition-all ${lang === 'zh' ? 'bg-[#660874] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}`}
+                                    >
+                                        中文
+                                    </button>
+                                    <button 
+                                        onClick={() => setLang('en')}
+                                        className={`px-2.5 py-1 rounded-full transition-all ${lang === 'en' ? 'bg-[#660874] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}`}
+                                    >
+                                        EN
+                                    </button>
+                                </div>
+
+                                {/* Admin Button */}
+                                {!isAdmin ? (
+                                    <button 
+                                        onClick={() => setShowAdminLogin(true)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-stone-700 bg-stone-100 hover:bg-[#660874] hover:text-white border border-stone-300 transition-all shadow-xs"
+                                    >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                        <span>{lang === 'zh' ? '管理员登录' : 'Admin Login'}</span>
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <span className="hidden sm:inline text-xs font-semibold text-[#660874] bg-purple-50 px-2.5 py-1 rounded-full border border-purple-200">
+                                            {loggedInEmail.split('@')[0]}
+                                        </span>
+                                        <button 
+                                            onClick={startEditing}
+                                            className="flex items-center gap-1 px-3 py-1.5 bg-[#660874] text-white rounded-full text-xs font-bold hover:bg-[#43044d] transition shadow-xs"
+                                        >
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            <span>{lang === 'zh' ? '编辑行程' : 'Edit Itinerary'}</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* ================= EDIT MODE (ADMIN) ================= */}
+                    {isEditing ? (
+                        <main className="max-w-4xl mx-auto px-4 py-8">
+                            <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-stone-200 space-y-8">
+                                <div className="flex justify-between items-center border-b pb-4">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-slate-800">
+                                            {lang === 'zh' ? '编辑研修行程与数据' : 'Edit Seminar & Itinerary Data'}
+                                        </h2>
+                                        <p className="text-xs text-stone-500 mt-1">
+                                            {lang === 'zh' ? '支持中英文双语维护，所有更改将实时永久存入云端' : 'Support bilingual content, all changes permanently synced to cloud'}
+                                        </p>
+                                    </div>
+                                    <button onClick={() => setIsEditing(false)} className="text-sm font-semibold text-stone-500 hover:text-stone-800">
+                                        {lang === 'zh' ? '退出编辑' : 'Exit Edit'}
+                                    </button>
+                                </div>
+
+                                {/* General Info Form */}
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-[#660874] uppercase tracking-wider">
+                                        {lang === 'zh' ? '基础信息设置 (Basic Info)' : 'Basic Information'}
+                                    </h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">中文标题</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.title_zh} onChange={e => setEditData({...editData, header: {...editData.header, title_zh: e.target.value}})} />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">English Title</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.title_en} onChange={e => setEditData({...editData, header: {...editData.header, title_en: e.target.value}})} />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">中文副标题</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.subtitle_zh} onChange={e => setEditData({...editData, header: {...editData.header, subtitle_zh: e.target.value}})} />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">English Subtitle</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.subtitle_en} onChange={e => setEditData({...editData, header: {...editData.header, subtitle_en: e.target.value}})} />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">住宿酒店 (Hotel)</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.hotel_zh} onChange={e => setEditData({...editData, header: {...editData.header, hotel_zh: e.target.value}})} />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-stone-500 font-bold">团队规模 (Pax)</label>
+                                            <input className="w-full border p-2.5 rounded-xl text-sm" value={editData.header.pax_zh} onChange={e => setEditData({...editData, header: {...editData.header, pax_zh: e.target.value}})} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Days Quick Editor */}
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-bold text-[#660874] uppercase tracking-wider">
+                                        {lang === 'zh' ? '每日行程与结合天气管理 (Daily Days)' : 'Daily Itinerary & Integrated Weather'}
+                                    </h3>
+                                    {editData.days.map((d, i) => (
+                                        <div key={i} className="p-4 bg-stone-50 border border-stone-200 rounded-2xl space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-black text-[#660874] uppercase">DAY {d.dayNum} - {d.date_zh}</span>
+                                                <span className="text-xs text-stone-400">{d.weather?.city_zh} · {d.weather?.tempHigh}/{d.weather?.tempLow}</span>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                <input className="border p-2 rounded-lg text-sm font-bold" value={d.title_zh} onChange={e => { const nd = [...editData.days]; nd[i].title_zh = e.target.value; setEditData({...editData, days: nd}); }} placeholder="中文标题" />
+                                                <input className="border p-2 rounded-lg text-sm font-bold" value={d.title_en} onChange={e => { const nd = [...editData.days]; nd[i].title_en = e.target.value; setEditData({...editData, days: nd}); }} placeholder="English Title" />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                <input className="border p-2 rounded-lg text-xs" value={d.weather?.wear_zh || ''} onChange={e => { const nd = [...editData.days]; nd[i].weather.wear_zh = e.target.value; setEditData({...editData, days: nd}); }} placeholder="穿搭建议 (中文)" />
+                                                <input className="border p-2 rounded-lg text-xs" value={d.weather?.wear_en || ''} onChange={e => { const nd = [...editData.days]; nd[i].weather.wear_en = e.target.value; setEditData({...editData, days: nd}); }} placeholder="Outfit Advice (English)" />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                <input className="border p-2 rounded-lg text-xs" value={d.meals?.dinner_zh || ''} onChange={e => { const nd = [...editData.days]; nd[i].meals.dinner_zh = e.target.value; setEditData({...editData, days: nd}); }} placeholder="晚餐安排 (中文)" />
+                                                <input className="border p-2 rounded-lg text-xs" value={d.meals?.dinner_en || ''} onChange={e => { const nd = [...editData.days]; nd[i].meals.dinner_en = e.target.value; setEditData({...editData, days: nd}); }} placeholder="Dinner (English)" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Super Admin Permissions Area */}
+                                {isCurrentSuperAdmin(loggedInEmail) && (
+                                    <div className="p-6 bg-purple-50 rounded-2xl border border-purple-200 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-sm font-bold text-[#660874]">
+                                                {lang === 'zh' ? '超级管理员权限：授权协作者管理' : 'Super Admin Privilege: Manage Collaborators'}
+                                            </h3>
+                                            <span className="text-[10px] bg-purple-200 text-purple-900 px-2 py-0.5 rounded font-black">SUPER ADMIN</span>
+                                        </div>
+                                        <p className="text-xs text-stone-600 leading-relaxed">
+                                            {lang === 'zh' 
+                                                ? '系统默认超级管理员为 laishengchet@moe.gov.my 与 maymay6002@gmail.com。您可随时添加其他协作者邮箱，授权其登入修改行程。'
+                                                : 'Default super admins are laishengchet@moe.gov.my and maymay6002@gmail.com. You can authorize additional editors below.'}
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <input 
+                                                type="email" 
+                                                value={newAdminEmail} 
+                                                onChange={e => setNewAdminEmail(e.target.value)} 
+                                                placeholder={lang === 'zh' ? "输入待授权邮箱 (如: member@gmail.com)" : "Enter email to authorize"}
+                                                className="flex-1 border p-2.5 rounded-xl text-sm bg-white"
+                                            />
+                                            <button onClick={handleAddAdmin} className="px-5 py-2.5 bg-[#660874] text-white rounded-xl text-sm font-bold hover:bg-[#43044d]">
+                                                {lang === 'zh' ? '添加授权' : 'Authorize'}
+                                            </button>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            {adminEmails.map(m => (
+                                                <div key={m} className={`border px-3 py-1 rounded-full text-xs flex items-center gap-2 ${isCurrentSuperAdmin(m) ? 'bg-purple-100 border-purple-300 font-bold text-purple-900' : 'bg-white border-stone-300 text-stone-700'}`}>
+                                                    <span>{m}</span>
+                                                    {isCurrentSuperAdmin(m) ? (
+                                                        <span className="text-[10px] text-purple-700">★</span>
+                                                    ) : (
+                                                        <button onClick={() => handleRemoveAdmin(m)} className="text-red-500 font-bold hover:text-red-700">×</button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Sticky Bottom Buttons */}
+                                <div className="sticky bottom-6 flex justify-end gap-3 pt-4 border-t bg-white">
+                                    <button onClick={() => setIsEditing(false)} className="px-6 py-3 rounded-full text-sm font-bold bg-stone-100 hover:bg-stone-200 text-stone-700">
+                                        {lang === 'zh' ? '取消' : 'Cancel'}
+                                    </button>
+                                    <button onClick={handleSave} className="px-8 py-3 rounded-full text-sm font-bold bg-[#660874] hover:bg-[#43044d] text-white shadow-lg transition">
+                                        {saveStatus || (lang === 'zh' ? "保存更新至云端" : "Save Updates to Cloud")}
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    ) : (
+                        /* ================= VIEW MODE ================= */
+                        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                            
+                            {/* 1. HERO BANNER */}
+                            <div className="relative rounded-3xl overflow-hidden shadow-2xl mb-8 bg-slate-950 border border-stone-200">
+                                <div className="absolute inset-0">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1800&q=85" 
+                                        alt="Tsinghua Campus Heritage" 
+                                        className="w-full h-full object-cover opacity-40 scale-105 filter saturate-125"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-[#43044d]/80 to-transparent"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                                </div>
+
+                                <div className="relative z-10 p-6 sm:p-10 md:p-12 text-white flex flex-col justify-between min-h-[350px] md:min-h-[400px]">
+                                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                                        <span className="bg-[#660874] text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1.5 border border-purple-400/30">
+                                            <span>🇲🇾</span> {lang === 'zh' ? '青运访华研修团' : 'YMM Delegation'} <span>🇨🇳</span>
+                                        </span>
+                                        <span className="bg-white/15 backdrop-blur-md text-amber-200 text-xs font-semibold px-3 py-1 rounded-full border border-white/10">
+                                            {lang === 'zh' ? data.header.dates_zh : data.header.dates_en}
+                                        </span>
+                                        <span className="bg-cyan-500/20 backdrop-blur-md text-cyan-200 text-xs font-semibold px-3 py-1 rounded-full border border-cyan-400/30">
+                                            {lang === 'zh' ? '清华大学 · 中关村' : 'Tsinghua Univ · Zhongguancun'}
+                                        </span>
+                                    </div>
+
+                                    <div className="max-w-3xl my-auto">
+                                        <h1 className="serif-title text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-md">
+                                            {lang === 'zh' ? (
+                                                <>
+                                                    <span className="block text-white tracking-wide">青运 · 清华大学</span>
+                                                    <span className="block mt-1 sm:mt-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-purple-100 to-white">
+                                                        科技创新研修班
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="block text-white tracking-wide">YMM · Tsinghua University</span>
+                                                    <span className="block mt-1 sm:mt-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-purple-100 to-white">
+                                                        Tech Innovation Seminar
+                                                    </span>
+                                                </>
+                                            )}
+                                        </h1>
+                                        <p className="mt-3 text-sm sm:text-lg text-purple-100 font-normal leading-relaxed opacity-95">
+                                            {lang === 'zh' ? data.header.subtitle_zh : data.header.subtitle_en}
+                                        </p>
+                                    </div>
+
+                                    {/* Bottom Info Bar in Hero */}
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/15 text-xs text-white/90">
+                                        <div>
+                                            <span className="text-stone-300 block text-[11px]">{lang === 'zh' ? '住宿酒店' : 'Hotel'}</span>
+                                            <span className="font-bold text-amber-300 truncate block">
+                                                {lang === 'zh' ? '智选假日（含每日早餐）' : 'Holiday Inn Express (Breakfast Incl.)'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-stone-300 block text-[11px]">{lang === 'zh' ? '代表团规模' : 'Delegates'}</span>
+                                            <span className="font-bold text-white block">
+                                                {lang === 'zh' ? `${data.header.pax_zh} 青年翘楚` : `${data.header.pax_en} Leaders`}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-stone-300 block text-[11px]">{lang === 'zh' ? '研修主轴' : 'Key Focus'}</span>
+                                            <span className="font-bold text-cyan-300 block">DeepSeek / AI / Robotics</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-stone-300 block text-[11px]">{lang === 'zh' ? '官方认证' : 'Certification'}</span>
+                                            <span className="font-bold text-emerald-300 block">
+                                                {lang === 'zh' ? '清华大学学习证书' : 'Tsinghua Certificate'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Real-Time Timely Weather Forecast Bar with Hourly Auto-Refresh */}
+                            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-stone-200 shadow-xs mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl flex-shrink-0 border border-sky-100 shadow-2xs">
+                                        {liveWeather.icon}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-black text-slate-900">
+                                                {lang === 'zh' ? '北京气象实况 · 实时自动更新' : 'Beijing Real-Time Weather · Live Forecast'}
+                                            </span>
+                                            <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                {lang === 'zh' ? '按小时自动刷新' : 'Hourly Auto-Refresh'}
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-600 mt-0.5">
+                                            <span className="font-black text-slate-800 text-sm">{liveWeather.temp}</span>
+                                            <span className="font-semibold text-stone-700">{lang === 'zh' ? liveWeather.condition_zh : liveWeather.condition_en}</span>
+                                            <span className="text-stone-300">|</span>
+                                            <span>{lang === 'zh' ? `体感 ${liveWeather.apparentTemp}` : `Feels ${liveWeather.apparentTemp}`}</span>
+                                            <span className="text-stone-300">|</span>
+                                            <span>{lang === 'zh' ? `相对湿度 ${liveWeather.humidity}` : `Humidity ${liveWeather.humidity}`}</span>
+                                            <span className="text-stone-300">|</span>
+                                            <span>{lang === 'zh' ? `微风 ${liveWeather.wind}` : `Wind ${liveWeather.wind}`}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2.5 self-end md:self-auto text-xs">
+                                    <span className="text-stone-400 text-[11px]">
+                                        {lang === 'zh' ? `上次更新: ${liveWeather.lastUpdated}` : `Updated: ${liveWeather.lastUpdated}`}
+                                    </span>
+                                    <button 
+                                        onClick={fetchLiveWeather}
+                                        disabled={liveWeather.isLoading}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-[#660874] hover:text-white rounded-full text-stone-700 font-bold transition border border-stone-200 shadow-2xs disabled:opacity-50"
+                                    >
+                                        <svg className={`w-3.5 h-3.5 ${liveWeather.isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <span>{liveWeather.isLoading ? (lang === 'zh' ? '更新中...' : 'Updating...') : (lang === 'zh' ? '刷新天气' : 'Refresh')}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* 2. OVERVIEW DASHBOARD & CARDS */}
+                            {selectedDayIndex === null ? (
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                    
+                                    {/* Left: Day Itinerary Cards (Weather integrated into cards directly) */}
+                                    <div className="lg:col-span-8 space-y-4">
+                                        <div className="flex items-center justify-between pb-1">
+                                            <div>
+                                                <h2 className="serif-title text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                                                    <span>{lang === 'zh' ? '八日研修 · 完整日程' : 'Complete 8-Day Itinerary'}</span>
+                                                    <span className="text-xs font-sans font-bold bg-[#660874]/10 text-[#660874] px-2.5 py-0.5 rounded-full">
+                                                        {lang === 'zh' ? '点击查看当天所有细节' : 'Click to view full day details'}
+                                                    </span>
+                                                </h2>
+                                                <p className="text-xs text-stone-500 mt-0.5">
+                                                    {lang === 'zh' ? '每日天气预报、穿搭建议、三餐饮食与参访时间线已整合在内' : 'Weather, outfit guide, dining and schedule fully combined per day'}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {data.days.map((day, idx) => {
+                                            const title = lang === 'zh' ? day.title_zh : day.title_en;
+                                            const date = lang === 'zh' ? day.date_zh : day.date_en;
+                                            const tag = lang === 'zh' ? day.tag_zh : day.tag_en;
+                                            const location = lang === 'zh' ? day.location_zh : day.location_en;
+                                            const weather = day.weather;
+                                            const weekdayInfo = getWeekdayInfo(idx);
+
+                                            return (
+                                                <div 
+                                                    key={idx}
+                                                    onClick={() => setSelectedDayIndex(idx)}
+                                                    className="group bg-white rounded-2xl p-3.5 sm:p-4 border border-stone-200/90 shadow-xs hover:shadow-xl hover:border-[#660874]/40 transition-all duration-300 cursor-pointer flex flex-col sm:flex-row gap-4 relative overflow-hidden"
+                                                >
+                                                    {/* Visual Cover Thumbnail */}
+                                                    <div className="w-full sm:w-44 h-32 sm:h-28 rounded-xl overflow-hidden flex-shrink-0 relative">
+                                                        <img 
+                                                            src={day.img} 
+                                                            alt={title} 
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                                                            loading="lazy"
+                                                        />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                                        <div className="absolute bottom-2 left-2.5 right-2.5 text-white pointer-events-none">
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider bg-black/40 border border-white/20 px-1.5 py-0.5 rounded backdrop-blur-md inline-block">
+                                                                {tag}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Day Content Information & Integrated Weather */}
+                                                    <div className="flex-1 flex flex-col justify-between">
+                                                        <div>
+                                                            {/* Date & Combined Weather Badge */}
+                                                            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                                                <span className="text-[11px] font-black text-[#660874] bg-purple-50 px-2 py-0.5 rounded border border-purple-200/60 uppercase">
+                                                                    DAY {day.dayNum}
+                                                                </span>
+                                                                <span className="text-xs font-bold text-stone-800">
+                                                                    {date}
+                                                                </span>
+                                                                
+                                                                {/* Explicit Weekday Chip */}
+                                                                <span className="text-[11px] font-bold text-[#660874] bg-purple-100/70 border border-purple-200 px-2 py-0.5 rounded">
+                                                                    {lang === 'zh' ? weekdayInfo.zh : weekdayInfo.en}
+                                                                </span>
+
+                                                                {/* Combined Weather Chip */}
+                                                                <span className="text-[11px] font-semibold text-sky-800 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded flex items-center gap-1 shadow-2xs">
+                                                                    <span>{weather.icon}</span>
+                                                                    <span>{weather.tempHigh} / {weather.tempLow}</span>
+                                                                    <span className="text-stone-400 hidden sm:inline">· {lang === 'zh' ? weather.condition_zh : weather.condition_en}</span>
+                                                                </span>
+                                                            </div>
+
+                                                            <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#660874] transition-colors leading-snug">
+                                                                {title}
+                                                            </h3>
+
+                                                            {/* Integrated Meal & Highlights Summary */}
+                                                            <div className="mt-2 text-xs text-stone-500 space-y-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-stone-400">🍽️ {lang === 'zh' ? '餐饮安排' : 'Meals'}:</span>
+                                                                    <span className="text-stone-700 font-medium truncate max-w-[280px]">
+                                                                        {lang === 'zh' 
+                                                                            ? `早: 包含 | 晚: ${day.meals?.dinner_zh || '自理'}`
+                                                                            : `Breakfast: Incl. | Dinner: ${day.meals?.dinner_en || 'Self'}`}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-[11px] text-amber-800 bg-amber-50/70 px-2 py-0.5 rounded inline-block">
+                                                                    🧣 {lang === 'zh' ? weather.wear_zh : weather.wear_en}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between text-[11px] text-stone-400 pt-2 border-t border-stone-100 mt-2">
+                                                            <span className="truncate max-w-[240px]">📍 {location}</span>
+                                                            <span className="text-[#660874] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                                                {lang === 'zh' ? '查看当日全部安排 →' : 'View Full Details →'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Right: Countdown, Quick Cards & Visual Culture */}
+                                    <div className="lg:col-span-4 space-y-6">
+                                        
+                                        {/* Countdown Tile */}
+                                        <div className="bg-gradient-to-br from-[#43044d] to-[#660874] text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                                            <div className="absolute -bottom-10 -right-10 w-36 h-36 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                                            <div className="text-xs font-bold uppercase tracking-wider text-purple-200">
+                                                {lang === 'zh' ? '距离启程出征' : 'COUNTDOWN TO DEPARTURE'}
+                                            </div>
+                                            <div className="flex items-baseline gap-2 my-2">
+                                                <span className="text-6xl font-black tracking-tight">{getDaysLeft()}</span>
+                                                <span className="text-base font-semibold text-purple-200">{lang === 'zh' ? '天 (DAYS)' : 'DAYS'}</span>
+                                            </div>
+                                            <p className="text-xs text-purple-200/90 leading-relaxed pt-2 border-t border-purple-400/20">
+                                                {lang === 'zh' 
+                                                    ? '2026年11月7日 21:00 吉隆坡机场 KLIA1 集合，期待与诸位同仁共启科技创新之旅！' 
+                                                    : 'Nov 7, 2026 21:00 KLIA1 assembly. Embarking on an inspiring journey of innovation!'}
+                                            </p>
+                                        </div>
+
+                                        {/* Quick Information Cards */}
+                                        <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-xs space-y-3">
+                                            <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider mb-1">
+                                                {lang === 'zh' ? '核心专区速查' : 'QUICK SECTIONS'}
+                                            </h3>
+
+                                            <div 
+                                                onClick={() => setSelectedDayIndex('flights')}
+                                                className="p-3.5 bg-stone-50 hover:bg-purple-50 hover:border-purple-200 border border-stone-200/70 rounded-2xl cursor-pointer transition flex items-center justify-between"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">✈️</div>
+                                                    <div>
+                                                        <div className="text-sm font-bold text-slate-800">
+                                                            {lang === 'zh' ? '航班时刻与行李' : 'Flight & Baggage'}
+                                                        </div>
+                                                        <div className="text-[11px] text-stone-500">
+                                                            {lang === 'zh' ? '国航往返直飞 · 托运 23KG' : 'Air China Direct · 23KG Allowance'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span className="text-stone-400 text-xs">→</span>
+                                            </div>
+
+                                            <div 
+                                                onClick={() => setSelectedDayIndex('dining')}
+                                                className="p-3.5 bg-stone-50 hover:bg-amber-50 hover:border-amber-200 border border-stone-200/70 rounded-2xl cursor-pointer transition flex items-center justify-between"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">🍲</div>
+                                                    <div>
+                                                        <div className="text-sm font-bold text-slate-800">
+                                                            {lang === 'zh' ? '京味美食与餐馆精选' : 'Peking Duck & Dining Guide'}
+                                                        </div>
+                                                        <div className="text-[11px] text-stone-500">
+                                                            {lang === 'zh' ? '全聚德 · 铜锅涮肉 · 家常菜' : 'Quanjude Duck · Hotpot · Local Food'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span className="text-stone-400 text-xs">→</span>
+                                            </div>
+
+                                            <div 
+                                                onClick={() => setSelectedDayIndex('reminders')}
+                                                className="p-3.5 bg-stone-50 hover:bg-emerald-50 hover:border-emerald-200 border border-stone-200/70 rounded-2xl cursor-pointer transition flex items-center justify-between"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">📌</div>
+                                                    <div>
+                                                        <div className="text-sm font-bold text-slate-800">
+                                                            {lang === 'zh' ? '行前准则与温馨贴士' : 'Important Travel Guidelines'}
+                                                        </div>
+                                                        <div className="text-[11px] text-stone-500">
+                                                            {lang === 'zh' ? '故宫门票实名预约 · 清华纪律' : 'Palace Museum booking · Campus etiquette'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span className="text-stone-400 text-xs">→</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Tsinghua Campus Highlights Image Grid */}
+                                        <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-xs">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h3 className="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                                                    <span>🏛️ {lang === 'zh' ? '清华与名胜画卷' : 'Tsinghua & Heritage Visuals'}</span>
+                                                </h3>
+                                                <span className="text-[10px] text-stone-400">HIGHLIGHTS</span>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="group relative h-28 rounded-xl overflow-hidden bg-stone-100">
+                                                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80" alt="Tsinghua" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                                                        <span className="text-[11px] text-white font-bold">{lang === 'zh' ? '水木清华 · 二校门' : 'Tsinghua 2nd Gate'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="group relative h-28 rounded-xl overflow-hidden bg-stone-100">
+                                                    <img src="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80" alt="Palace" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                                                        <span className="text-[11px] text-white font-bold">{lang === 'zh' ? '故宫太和殿' : 'Forbidden City'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="group relative h-28 rounded-xl overflow-hidden bg-stone-100">
+                                                    <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80" alt="Robotics" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                                                        <span className="text-[11px] text-white font-bold">{lang === 'zh' ? '机器人与AI实境' : 'Humanoid Robotics'}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="group relative h-28 rounded-xl overflow-hidden bg-stone-100">
+                                                    <img src="https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=600&q=80" alt="Tianjin" className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                                                        <span className="text-[11px] text-white font-bold">{lang === 'zh' ? '天津海河风貌' : 'Tianjin Haihe Eye'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            ) : (
+                                /* 3. DETAILED SINGLE-DAY VIEW (COMBINED WEATHER, MEALS, NOTICE & SCHEDULE) */
+                                <div className="space-y-6">
+                                    
+                                    {/* Top Navigation & Day Switcher */}
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <button 
+                                            onClick={() => setSelectedDayIndex(null)}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-xs font-bold text-stone-700 border border-stone-200 hover:border-[#660874] hover:text-[#660874] shadow-xs transition"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                                            <span>{lang === 'zh' ? '返回所有日程总览' : 'Back to Itinerary Overview'}</span>
+                                        </button>
+                                        
+                                        {typeof selectedDayIndex === 'number' && (
+                                            <div className="text-xs text-stone-500 font-semibold bg-stone-100 px-3 py-1 rounded-full">
+                                                DAY {data.days[selectedDayIndex].dayNum} OF {data.days.length}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Day Header Banner */}
+                                    {typeof selectedDayIndex === 'number' && (() => {
+                                        const curDay = data.days[selectedDayIndex];
+                                        const title = lang === 'zh' ? curDay.title_zh : curDay.title_en;
+                                        const date = lang === 'zh' ? curDay.date_zh : curDay.date_en;
+                                        const location = lang === 'zh' ? curDay.location_zh : curDay.location_en;
+                                        const weekdayInfo = getWeekdayInfo(selectedDayIndex);
+
+                                        return (
+                                            <div className="relative rounded-3xl overflow-hidden shadow-lg h-60 sm:h-72 bg-slate-900 border border-stone-200">
+                                                <img 
+                                                    src={curDay.img} 
+                                                    alt={title} 
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"></div>
+                                                
+                                                <div className="absolute bottom-6 left-6 right-6 text-white">
+                                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                                        <span className="bg-[#660874] text-white text-xs font-black px-2.5 py-0.5 rounded uppercase">
+                                                            DAY {curDay.dayNum}
+                                                        </span>
+                                                        <span className="text-sm font-bold text-purple-200">
+                                                            {date} ({lang === 'zh' ? weekdayInfo.zh : weekdayInfo.en})
+                                                        </span>
+                                                        <span className="text-xs bg-white/20 px-2.5 py-0.5 rounded backdrop-blur-sm flex items-center gap-1">
+                                                            <span>{curDay.weather.icon}</span>
+                                                            <span>{curDay.weather.tempHigh} / {curDay.weather.tempLow}</span>
+                                                        </span>
+                                                        <span className="text-xs bg-white/20 px-2 py-0.5 rounded backdrop-blur-sm ml-auto">
+                                                            📍 {location}
+                                                        </span>
+                                                    </div>
+                                                    <h2 className="serif-title text-2xl sm:text-4xl font-black">
+                                                        {title}
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {/* Horizontal Tab Navigator for Days */}
+                                    {typeof selectedDayIndex === 'number' && (
+                                        <div className="bg-white p-2 rounded-2xl border border-stone-200 flex gap-2 overflow-x-auto hide-scrollbar">
+                                            {data.days.map((d, i) => {
+                                                const wInfo = getWeekdayInfo(i);
+                                                return (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => setSelectedDayIndex(i)}
+                                                        className={`min-w-[105px] py-2 px-3 rounded-xl text-center text-xs font-bold transition flex-shrink-0 ${
+                                                            selectedDayIndex === i 
+                                                                ? 'bg-[#660874] text-white shadow-md' 
+                                                                : 'bg-stone-50 text-stone-600 hover:bg-stone-100'
+                                                        }`}
+                                                    >
+                                                        <div>DAY {d.dayNum}</div>
+                                                        <div className={`text-[11px] font-bold mt-0.5 ${selectedDayIndex === i ? 'text-purple-200' : 'text-[#660874]'}`}>
+                                                            {lang === 'zh' ? wInfo.zh : wInfo.en}
+                                                        </div>
+                                                        <div className={`text-[9px] font-normal ${selectedDayIndex === i ? 'text-purple-300' : 'text-stone-400'}`}>
+                                                            {lang === 'zh' ? d.date_zh.split(' ')[0] : d.date_en.split(',')[0]}
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                            <button 
+                                                onClick={() => setSelectedDayIndex('dining')}
+                                                className="min-w-[90px] py-2 px-3 rounded-xl text-center text-xs font-bold transition flex-shrink-0 bg-stone-50 text-amber-800 hover:bg-stone-100"
+                                            >
+                                                🍲 {lang === 'zh' ? '美食甄选' : 'Dining'}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* UNIFIED ALL-IN-ONE DAY VIEW: Weather + Dining + Agenda + Reminders */}
+                                    {typeof selectedDayIndex === 'number' && (() => {
+                                        const curDay = data.days[selectedDayIndex];
+                                        const weather = curDay.weather;
+                                        const meals = curDay.meals;
+                                        const items = lang === 'zh' ? (curDay.items_zh || []) : (curDay.items_en || []);
+                                        const notice = lang === 'zh' ? curDay.notice_zh : curDay.notice_en;
+
+                                        return (
+                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                                
+                                                {/* Left Column: Combined Weather, Meals & Hospitality for THIS Day */}
+                                                <div className="md:col-span-5 space-y-4">
+                                                    
+                                                    {/* 1. Day Weather & Outfit Advice (Unified) */}
+                                                    <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-xs space-y-3">
+                                                        <div className="flex items-center justify-between border-b pb-2">
+                                                            <div className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                                                <span>🌤️</span>
+                                                                <span>{lang === 'zh' ? '当日气象预报与穿搭' : 'Weather & Clothing Guide'}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <button 
+                                                                    onClick={fetchLiveWeather}
+                                                                    title="Refresh Weather"
+                                                                    className="text-[10px] text-stone-500 hover:text-[#660874] flex items-center gap-1 bg-stone-50 px-2 py-0.5 rounded border border-stone-200"
+                                                                >
+                                                                    <svg className={`w-3 h-3 ${liveWeather.isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                                    <span>{lang === 'zh' ? '按时刷新' : 'Hourly Refresh'}</span>
+                                                                </button>
+                                                                <span className="text-[10px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded">
+                                                                    {lang === 'zh' ? weather.city_zh : weather.city_en}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between pt-1">
+                                                            <div>
+                                                                <div className="text-xs text-stone-400">{lang === 'zh' ? '日最高温 / 最低温' : 'High / Low'}</div>
+                                                                <div className="text-3xl font-black text-slate-900 flex items-baseline gap-1.5">
+                                                                    <span>{weather.tempHigh}</span>
+                                                                    <span className="text-sm font-semibold text-stone-400">/ {weather.tempLow}</span>
+                                                                </div>
+                                                                <div className="text-xs text-stone-500 mt-0.5">
+                                                                    {lang === 'zh' ? `降水概率 ${weather.pop}` : `Precipitation ${weather.pop}`}
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="text-3xl">{weather.icon}</div>
+                                                                <div className="text-xs font-bold text-stone-700 mt-1">
+                                                                    {lang === 'zh' ? weather.condition_zh : weather.condition_en}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Personal Outfit & Windproof Tip */}
+                                                        <div className="p-3 bg-amber-50/80 border border-amber-200/60 rounded-2xl text-xs space-y-1">
+                                                            <div className="font-bold text-amber-900 flex items-center gap-1">
+                                                                <span>🧣</span>
+                                                                <span>{lang === 'zh' ? '当日穿搭与出行装备建议' : 'Outfit & Gear Advice'}</span>
+                                                            </div>
+                                                            <p className="text-stone-700 text-[11px] leading-relaxed">
+                                                                {lang === 'zh' ? weather.wear_zh : weather.wear_en}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 2. Day Meals & Hotel Arrangements */}
+                                                    <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-xs space-y-3">
+                                                        <div className="text-xs font-black text-slate-900 border-b pb-2 flex items-center justify-between">
+                                                            <span className="flex items-center gap-1.5">
+                                                                <span>🍽️</span>
+                                                                <span>{lang === 'zh' ? '当日三餐饮食规划' : 'Meals & Dining Arrangements'}</span>
+                                                            </span>
+                                                            <span className="text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded font-bold">50 PAX</span>
+                                                        </div>
+
+                                                        <div className="space-y-2 text-xs">
+                                                            <div className="p-2.5 bg-stone-50 rounded-xl flex items-start gap-2">
+                                                                <span className="font-bold text-stone-500 w-12 flex-shrink-0">{lang === 'zh' ? '早餐' : 'Breakfast'}:</span>
+                                                                <span className="text-stone-800 font-medium">{lang === 'zh' ? meals.breakfast_zh : meals.breakfast_en}</span>
+                                                            </div>
+
+                                                            <div className="p-2.5 bg-stone-50 rounded-xl flex items-start gap-2">
+                                                                <span className="font-bold text-stone-500 w-12 flex-shrink-0">{lang === 'zh' ? '午餐' : 'Lunch'}:</span>
+                                                                <span className="text-stone-800 font-medium">{lang === 'zh' ? meals.lunch_zh : meals.lunch_en}</span>
+                                                            </div>
+
+                                                            <div className="p-2.5 bg-stone-50 rounded-xl flex items-start gap-2">
+                                                                <span className="font-bold text-stone-500 w-12 flex-shrink-0">{lang === 'zh' ? '晚餐' : 'Dinner'}:</span>
+                                                                <span className="text-[#660874] font-bold">{lang === 'zh' ? meals.dinner_zh : meals.dinner_en}</span>
+                                                            </div>
+
+                                                            <div className="p-2.5 bg-purple-50/70 border border-purple-100 rounded-xl text-stone-700 mt-2">
+                                                                <div className="font-bold text-[#660874] mb-0.5">🏨 {lang === 'zh' ? '住宿酒店' : 'Accommodation'}</div>
+                                                                <div className="text-[11px]">{lang === 'zh' ? data.header.hotel_zh : data.header.hotel_en}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 3. Day Reminder & Notice */}
+                                                    <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-3xl p-5 text-xs space-y-1.5">
+                                                        <div className="font-bold text-emerald-900 flex items-center gap-1.5">
+                                                            <span>📌</span>
+                                                            <span>{lang === 'zh' ? '当日重要温馨提醒' : 'Important Note for Today'}</span>
+                                                        </div>
+                                                        <p className="text-emerald-950/80 leading-relaxed text-[11px]">
+                                                            {notice}
+                                                        </p>
+                                                    </div>
+
+                                                </div>
+
+                                                {/* Right Column: Detailed Timeline Schedule for THIS Day */}
+                                                <div className="md:col-span-7">
+                                                    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200 shadow-xs space-y-5">
+                                                        <div className="flex items-center justify-between border-b pb-3">
+                                                            <div>
+                                                                <h3 className="serif-title text-xl font-bold text-slate-900">
+                                                                    {lang === 'zh' ? '逐项时间线日程' : 'Schedule & Timeline'}
+                                                                </h3>
+                                                                <p className="text-xs text-stone-400 mt-0.5">
+                                                                    {lang === 'zh' ? '全程专车保障与导游/领队现场协调' : 'Guided coordination & group transportation'}
+                                                                </p>
+                                                            </div>
+                                                            <span className="text-xs font-sans text-stone-400 font-semibold uppercase">DAY {curDay.dayNum}</span>
+                                                        </div>
+
+                                                        <div className="space-y-3.5">
+                                                            {items.map((line, li) => {
+                                                                const isHighlight = line.includes('开班式') || line.includes('DeepSeek') || line.includes('结业') || line.includes('小米') || line.includes('Opening') || line.includes('Graduation');
+                                                                const isSub = line.startsWith('📍') || line.startsWith('🤖') || line.startsWith('1.') || line.startsWith('2.');
+
+                                                                return (
+                                                                    <div 
+                                                                        key={li}
+                                                                        className={`p-4 rounded-2xl border transition-all ${
+                                                                            isHighlight 
+                                                                                ? 'bg-purple-50/80 border-purple-200 shadow-xs text-purple-950 font-bold' 
+                                                                                : isSub
+                                                                                ? 'bg-stone-50 border-stone-200 text-stone-800'
+                                                                                : 'bg-white border-stone-100 hover:border-stone-200 text-slate-700'
+                                                                        }`}
+                                                                    >
+                                                                        <div className="text-sm leading-relaxed">
+                                                                            {line}
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+
+                                                        {/* Scenic Spot Visual at Bottom */}
+                                                        <div className="mt-6 pt-4 border-t border-stone-100">
+                                                            <div className="text-xs font-bold text-stone-400 mb-2 uppercase">
+                                                                {lang === 'zh' ? '实景视界' : 'VISUAL PREVIEW'}
+                                                            </div>
+                                                            <div className="h-44 rounded-2xl overflow-hidden relative shadow-inner">
+                                                                <img src={curDay.img} alt="Preview" className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-3">
+                                                                    <span className="text-xs font-bold text-white">📍 {lang === 'zh' ? curDay.location_zh : curDay.location_en}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {/* Flights View */}
+                                    {selectedDayIndex === 'flights' && (
+                                        <div className="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-stone-200 shadow-lg space-y-6">
+                                            <div className="border-b pb-4">
+                                                <span className="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full uppercase">FLIGHT ITINERARY</span>
+                                                <h2 className="serif-title text-2xl font-bold text-slate-900 mt-2">
+                                                    {lang === 'zh' ? '国航往返直飞航班与行李要求' : 'Air China Flight & Luggage Details'}
+                                                </h2>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {data.flights.map((f, fi) => (
+                                                    <div key={fi} className="p-4 bg-stone-50 rounded-2xl border border-stone-200 font-mono text-sm font-semibold text-slate-800 flex items-center gap-3">
+                                                        <span className="text-lg">🛫</span>
+                                                        <span>{lang === 'zh' ? f.zh : f.en}</span>
+                                                    </div>
+                                                ))}
+
+                                                <div className="p-5 bg-amber-50 rounded-2xl border border-amber-200/80 text-amber-900 space-y-2">
+                                                    <div className="font-bold flex items-center gap-2 text-sm">
+                                                        <span>📍 {lang === 'zh' ? '机场集合准则' : 'Airport Meeting Guide'}</span>
+                                                    </div>
+                                                    <p className="text-xs leading-relaxed text-amber-800">
+                                                        {lang === 'zh' ? data.header.meeting_zh : data.header.meeting_en}。
+                                                        {lang === 'zh' 
+                                                            ? '请各位团员准时抵达吉隆坡国际机场第一航站楼（KLIA1）国航柜台前集合，由青运带团干部统一办理团队行李托运与登机牌。' 
+                                                            : 'Please assemble at KLIA1 Air China counter on time. Group leaders will facilitate team check-in and luggage tags.'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Dining & Cuisine Guide View */}
+                                    {selectedDayIndex === 'dining' && (
+                                        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-stone-200 shadow-lg space-y-6">
+                                            <div className="border-b pb-4">
+                                                <span className="text-xs font-black text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full uppercase">CUISINE GUIDE</span>
+                                                <h2 className="serif-title text-2xl font-bold text-slate-900 mt-2">
+                                                    {lang === 'zh' ? data.diningGuide.title_zh : data.diningGuide.title_en}
+                                                </h2>
+                                                <p className="text-xs text-stone-500 mt-1">
+                                                    {lang === 'zh' ? '专为 50 人研学大团队考察筛选的中关村与清华科技园周边餐厅' : 'Selected restaurants near Tsinghua & Zhongguancun capable of hosting 50 guests'}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                {data.diningGuide.categories.map((cat, ci) => (
+                                                    <div key={ci} className="space-y-3">
+                                                        <h3 className="text-base font-black text-[#660874] flex items-center gap-2">
+                                                            <span>✨</span>
+                                                            <span>{lang === 'zh' ? cat.cat_zh : cat.cat_en}</span>
+                                                        </h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                            {cat.list.map((r, ri) => (
+                                                                <div key={ri} className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-1.5">
+                                                                    <div className="font-bold text-slate-900 text-sm">
+                                                                        {lang === 'zh' ? r.name_zh : r.name_en}
+                                                                    </div>
+                                                                    <p className="text-xs text-stone-600 leading-relaxed">
+                                                                        {lang === 'zh' ? r.detail_zh : r.detail_en}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Reminders & Guidelines View */}
+                                    {selectedDayIndex === 'reminders' && (
+                                        <div className="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-stone-200 shadow-lg space-y-6">
+                                            <div className="border-b pb-4">
+                                                <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full uppercase">TRAVEL NOTICE</span>
+                                                <h2 className="serif-title text-2xl font-bold text-slate-900 mt-2">
+                                                    {lang === 'zh' ? data.generalReminders.title_zh : data.generalReminders.title_en}
+                                                </h2>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                {data.generalReminders.items.map((r, ri) => (
+                                                    <div key={ri} className="p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs sm:text-sm text-stone-700 leading-relaxed flex items-start gap-3">
+                                                        <span className="text-[#660874] font-bold text-base mt-0.5">•</span>
+                                                        <span>{lang === 'zh' ? r.zh : r.en}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                </div>
+                            )}
+
+                        </main>
+                    )}
+
+                    {/* Footer */}
+                    <footer className="mt-16 border-t border-stone-200 bg-white py-8 text-center text-xs text-stone-400">
+                        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+                                <span className="font-black text-[#660874]">青运 · 清华大学</span>
+                                <span className="hidden sm:inline text-stone-300">|</span>
+                                <span className="font-semibold text-slate-700">科技创新研修班</span>
+                            </div>
+                            <p>© 2026 Young Malaysians Movement (YMM) · All Rights Reserved</p>
+                        </div>
+                    </footer>
+
+                    {/* ================= DRAGGABLE AI CHATBOT ================= */}
+                    <div 
+                        style={{
+                            position: 'fixed',
+                            left: chatPos.x !== null ? `${chatPos.x}px` : 'auto',
+                            top: chatPos.y !== null ? `${chatPos.y}px` : 'auto',
+                            right: chatPos.x !== null ? 'auto' : '1.5rem',
+                            bottom: chatPos.y !== null ? 'auto' : '1.5rem',
+                            zIndex: 60
+                        }}
+                    >
+                        {!isChatOpen ? (
+                            <div 
+                                onMouseDown={handleMouseDown}
+                                onTouchStart={handleMouseDown}
+                                onClick={() => {
+                                    if (!dragStartRef.current.moved) {
+                                        setIsChatOpen(true);
+                                    }
+                                }}
+                                className="drag-handle group relative flex items-center gap-2 px-4 py-3.5 bg-gradient-to-r from-[#660874] to-[#43044d] text-white rounded-full shadow-2xl hover:scale-105 transition-all border border-purple-400/40"
+                            >
+                                <span className="text-stone-300 text-xs mr-0.5">⋮⋮</span>
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+                                </span>
+                                <span className="text-xl">🤖</span>
+                                <span className="text-xs font-bold tracking-wide">
+                                    {lang === 'zh' ? 'AI 助手 (可拖拽)' : 'AI Chat (Drag)'}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="w-[360px] sm:w-[400px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-5rem)] bg-white rounded-3xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden animate-in fade-in duration-200">
+                                
+                                {/* Draggable Chat Header */}
+                                <div 
+                                    onMouseDown={handleMouseDown}
+                                    onTouchStart={handleMouseDown}
+                                    className="drag-handle bg-gradient-to-r from-[#660874] to-[#43044d] text-white p-3.5 flex items-center justify-between"
+                                >
+                                    <div className="flex items-center gap-2.5 pointer-events-none">
+                                        <span className="text-white/60 text-xs font-mono">⋮⋮</span>
+                                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-base">🤖</div>
+                                        <div>
+                                            <div className="text-xs font-black flex items-center gap-1.5">
+                                                <span>{lang === 'zh' ? '青运研修 AI 智能助手' : 'YMM Seminar AI Assistant'}</span>
+                                                <span className="text-[10px] bg-emerald-400/20 text-emerald-300 px-1 py-0.2 rounded font-medium">ONLINE</span>
+                                            </div>
+                                            <div className="text-[10px] text-purple-200">
+                                                {lang === 'zh' ? '可拖拽至屏幕任意位置' : 'Drag anywhere on screen'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="no-drag flex items-center gap-1">
+                                        {/* Reset to Center Button */}
+                                        <button 
+                                            onClick={() => setChatPos({ x: Math.max(10, (window.innerWidth - 380) / 2), y: Math.max(10, (window.innerHeight - 520) / 2) })}
+                                            className="px-2 py-1 bg-white/10 hover:bg-white/20 rounded text-[10px] font-bold"
+                                            title="Center"
+                                        >
+                                            {lang === 'zh' ? '居中' : 'Center'}
+                                        </button>
+                                        <button 
+                                            onClick={() => setIsChatOpen(false)}
+                                            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Quick Questions Pills */}
+                                <div className="no-drag bg-stone-50 border-b border-stone-100 p-2 flex gap-1.5 overflow-x-auto hide-scrollbar text-[11px]">
+                                    {lang === 'zh' ? (
+                                        <>
+                                            <button onClick={() => handleSendChatMessage("北京烤鸭与铜锅涮肉哪家好？")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🍗 烤鸭与火锅</button>
+                                            <button onClick={() => handleSendChatMessage("吃饭和交通人均预算大概多少钱？")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">💰 人均预算</button>
+                                            <button onClick={() => handleSendChatMessage("北京气温冷不冷？需要穿什么衣服？")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🧣 天气与穿搭</button>
+                                            <button onClick={() => handleSendChatMessage("故宫门票怎么预约？")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🏛️ 故宫预约</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button onClick={() => handleSendChatMessage("Where are the best Peking duck and hotpot?")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🍗 Duck & Hotpot</button>
+                                            <button onClick={() => handleSendChatMessage("What is the average food & transport budget?")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">💰 Daily Budget</button>
+                                            <button onClick={() => handleSendChatMessage("What is the weather and what to wear?")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🧣 Weather & Outfit</button>
+                                            <button onClick={() => handleSendChatMessage("How to book Forbidden City tickets?")} className="px-2.5 py-1 bg-white border border-stone-200 rounded-full whitespace-nowrap hover:text-[#660874]">🏛️ Palace Tickets</button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Chat Message Stream */}
+                                <div className="no-drag flex-1 p-3.5 overflow-y-auto space-y-3 bg-[#fbfaf8] text-xs">
+                                    {chatMessages.map((msg, mi) => (
+                                        <div key={mi} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                            <div className={`max-w-[85%] p-3 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-2xs ${
+                                                msg.role === 'user' 
+                                                    ? 'bg-[#660874] text-white rounded-br-none' 
+                                                    : 'bg-white border border-stone-200 text-stone-800 rounded-bl-none'
+                                            }`}>
+                                                {lang === 'zh' ? msg.text_zh : msg.text_en}
+                                            </div>
+                                            <span className="text-[10px] text-stone-400 mt-1 px-1">{msg.time}</span>
+                                        </div>
+                                    ))}
+
+                                    {isAiTyping && (
+                                        <div className="flex items-center gap-1.5 p-2.5 bg-white border border-stone-200 rounded-xl w-fit shadow-2xs">
+                                            <span className="text-stone-400 text-[10px]">{lang === 'zh' ? 'AI 正在思考' : 'AI thinking'}</span>
+                                            <span className="w-1.5 h-1.5 bg-[#660874] rounded-full animate-bounce"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#660874] rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-[#660874] rounded-full animate-bounce [animation-delay:0.3s]"></span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Chat Input Area */}
+                                <form 
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleSendChatMessage(chatInput);
+                                    }}
+                                    className="no-drag p-2.5 bg-white border-t border-stone-200 flex items-center gap-2"
+                                >
+                                    <input 
+                                        type="text" 
+                                        value={chatInput} 
+                                        onChange={(e) => setChatInput(e.target.value)} 
+                                        placeholder={lang === 'zh' ? "询问美食、预算、天气、交通..." : "Ask food, budget, weather, subway..."} 
+                                        className="flex-1 bg-stone-100 border border-stone-200 rounded-full px-3.5 py-2 text-xs outline-none focus:border-[#660874] focus:bg-white"
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        className="w-8 h-8 rounded-full bg-[#660874] text-white flex items-center justify-center hover:bg-[#43044d] transition shadow-xs flex-shrink-0 disabled:opacity-40"
+                                        disabled={!chatInput.trim()}
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </button>
+                                </form>
+
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Admin Login Modal */}
+                    {showAdminLogin && (
+                        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-stone-200">
+                                <h3 className="serif-title text-xl font-bold text-slate-900 mb-1">
+                                    {lang === 'zh' ? '管理员身份验证' : 'Admin Authentication'}
+                                </h3>
+                                <p className="text-xs text-stone-500 mb-5">
+                                    {lang === 'zh' 
+                                        ? '请输入已授权的邮箱（超级管理员：maymay6002@gmail.com 或 laishengchet@moe.gov.my）'
+                                        : 'Please enter authorized admin email'}
+                                </p>
+
+                                <form onSubmit={handleAdminLogin} className="space-y-4">
+                                    <div>
+                                        <input 
+                                            type="email" 
+                                            placeholder="maymay6002@gmail.com / laishengchet@moe.gov.my" 
+                                            value={adminEmail} 
+                                            onChange={e => setAdminEmail(e.target.value)}
+                                            className="w-full border border-stone-300 rounded-xl p-3 text-sm focus:border-[#660874] outline-none"
+                                            required
+                                        />
+                                        {loginError && <p className="text-red-500 text-xs mt-1.5">{loginError}</p>}
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setShowAdminLogin(false)}
+                                            className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-stone-100 hover:bg-stone-200 text-stone-700 transition"
+                                        >
+                                            {lang === 'zh' ? '取消' : 'Cancel'}
+                                        </button>
+                                        <button 
+                                            type="submit" 
+                                            className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-[#660874] hover:bg-[#43044d] text-white transition shadow-md"
+                                        >
+                                            {lang === 'zh' ? '确认登录' : 'Confirm Login'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
